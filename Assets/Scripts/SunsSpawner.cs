@@ -7,17 +7,54 @@ public class SunsSpawner : MonoBehaviour
     public GameObject Sun;
     public float XPos;
     public float YPos;
-    private int SunCount = 1;
+
 
     public float speed = 0.2f;
     public float changeTime = 1.5f;
-    float timer;
+    private float timer;
+    private float lifeSpan = 8f;
+    private bool fade;
+    private float fadeSpeed = 0.05f;
+    public bool sunFlowerMade;
+
+
     private float dir;
 
     void Start()
     {
+        fade = false;
         dir = 1.0f;
-        StartCoroutine(SunDrop());
+    }
+
+    void Update()
+    {
+        timer += Time.deltaTime;
+        if (timer >= lifeSpan)
+        {
+            death();
+        }
+
+        if (!sunFlowerMade)
+        {
+            transform.Translate(Vector2.down * speed * Time.deltaTime);
+        }
+        if (fade)
+        {
+            Color spColor = GetComponent<SpriteRenderer>().color;
+            GetComponent<SpriteRenderer>().color = new Color(
+                spColor.r,
+                spColor.g,
+                spColor.b,
+                spColor.a - fadeSpeed
+            );
+            if (spColor.a <=0)
+            {
+                Destroy(gameObject);
+            }
+        }
+
+
+        
     }
 
     void FixedUpdate()
@@ -30,17 +67,9 @@ public class SunsSpawner : MonoBehaviour
             dir = Mathf.Abs(dir) * 0;
     }
 
-    
-    IEnumerator SunDrop()
+    public void death()
     {
-        while (SunCount>-1)
-        { 
-            XPos = Random.Range(-6.66f,6.66f);
-            YPos = 6.25f;
-            Instantiate(Sun, new Vector2(XPos,YPos), Quaternion.identity);
-            yield return new WaitForSeconds(Random.Range(10.0f, 15.0f));
-            SunCount++;
-        }
+        fade = true;
     }
 
 
